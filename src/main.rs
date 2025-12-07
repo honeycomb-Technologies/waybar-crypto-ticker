@@ -79,19 +79,17 @@ fn acquire_instance_lock() -> bool {
 }
 
 /// Load cryptocurrency icons from the data directory.
+/// Checks user directory (~/.local/share) first, then system directory (/usr/share).
 fn load_icons(config: &Config) -> HashMap<String, gtk4::cairo::ImageSurface> {
     let mut icons = HashMap::new();
-    let icons_dir = Config::icons_dir();
     let icon_size = config.appearance.icon_size;
 
     for coin in &config.coins {
-        let path = icons_dir.join(&coin.icon);
-        if !path.exists() {
-            continue;
-        }
-
-        if let Some(surface) = render_icon_to_surface(&path, icon_size) {
-            icons.insert(coin.icon.clone(), surface);
+        // Use find_icon to check user dir first, then system dir
+        if let Some(path) = Config::find_icon(&coin.icon) {
+            if let Some(surface) = render_icon_to_surface(&path, icon_size) {
+                icons.insert(coin.icon.clone(), surface);
+            }
         }
     }
 

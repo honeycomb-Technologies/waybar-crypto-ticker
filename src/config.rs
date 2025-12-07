@@ -222,10 +222,44 @@ impl Config {
     }
 
     /// Get the icons directory path.
+    /// Checks user directory first, falls back to system directory.
     pub fn icons_dir() -> PathBuf {
-        dirs::data_dir()
+        let user_dir = dirs::data_dir()
+            .unwrap_or_else(|| PathBuf::from("."))
+            .join("waybar-crypto-ticker/icons");
+
+        if user_dir.exists() {
+            user_dir
+        } else {
+            // Fall back to system-wide installation path
+            PathBuf::from("/usr/share/waybar-crypto-ticker/icons")
+        }
+    }
+
+    /// Find an icon file, checking user directory first, then system directory.
+    pub fn find_icon(filename: &str) -> Option<PathBuf> {
+        // Check user directory first
+        let user_path = dirs::data_dir()
             .unwrap_or_else(|| PathBuf::from("."))
             .join("waybar-crypto-ticker/icons")
+            .join(filename);
+
+        if user_path.exists() {
+            return Some(user_path);
+        }
+
+        // Fall back to system directory
+        let system_path = PathBuf::from("/usr/share/waybar-crypto-ticker/icons").join(filename);
+        if system_path.exists() {
+            return Some(system_path);
+        }
+
+        None
+    }
+
+    /// Get the example config path for first-time setup.
+    pub fn example_config_path() -> PathBuf {
+        PathBuf::from("/usr/share/waybar-crypto-ticker/config.example.toml")
     }
 }
 

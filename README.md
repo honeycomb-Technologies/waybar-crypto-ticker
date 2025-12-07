@@ -72,7 +72,24 @@ sudo apt install libgtk-4-dev libgtk4-layer-shell-dev rustc cargo
 
 ## Installation
 
-### One-liner install
+### Arch Linux (AUR)
+
+```bash
+yay -S waybar-crypto-ticker
+```
+
+Or with any AUR helper:
+```bash
+paru -S waybar-crypto-ticker
+```
+
+After installing, copy the example config:
+```bash
+mkdir -p ~/.config/waybar-crypto-ticker
+cp /usr/share/waybar-crypto-ticker/config.example.toml ~/.config/waybar-crypto-ticker/config.toml
+```
+
+### One-liner install (other distros)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/BurgessTG/waybar-crypto-ticker/main/install.sh | bash
