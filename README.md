@@ -26,6 +26,7 @@ Icons included out of the box:
 | Cardano | ADA | `ADA/USD` |
 | XRP | XRP | `XRP/USD` |
 | Avalanche | AVAX | `AVAX/USD` |
+| SNEK | SNEK | `SNEK/USD` |
 
 ### Adding More Coins
 
