@@ -11,7 +11,7 @@ anchor = "top-right"
 
 # Margins from screen edges (pixels)
 margin_top = 0
-margin_right = 200
+margin_right = 620
 margin_bottom = 0
 margin_left = 0
 
@@ -21,12 +21,12 @@ height = 26
 
 [appearance]
 # Font family (must be installed on system)
-font_family = "monospace"
+font_family = "CaskaydiaMono Nerd Font"
 font_size = 11.0
 
 # Colors in hex format
-color_up = "#4ec970"      # Price going up
-color_down = "#e05555"    # Price going down
+color_up = "#b58ee6"      # Price going up (Aether purple)
+color_down = "#D35051"    # Price going down
 color_neutral = "#888888" # No significant change
 
 # Icon size in pixels
@@ -34,7 +34,7 @@ icon_size = 16
 
 [animation]
 # Scroll speed in pixels per second
-scroll_speed = 30.0
+scroll_speed = 25.0
 
 # Frames per second (1-120)
 fps = 60
@@ -55,14 +55,19 @@ name = "Ethereum"
 icon = "eth.svg"
 
 [[coins]]
-symbol = "SOL/USD"
-name = "Solana"
-icon = "sol.svg"
-
-[[coins]]
 symbol = "ADA/USD"
 name = "Cardano"
 icon = "ada.svg"
+
+[[coins]]
+symbol = "SOL/USD"
+name = "Solana"
+icon = "sol.png"
+
+[[coins]]
+symbol = "AVAX/USD"
+name = "Avalanche"
+icon = "avax.svg"
 
 [[coins]]
 symbol = "XRP/USD"
@@ -70,9 +75,9 @@ name = "XRP"
 icon = "xrp.svg"
 
 [[coins]]
-symbol = "AVAX/USD"
-name = "Avalanche"
-icon = "avax.svg"
+symbol = "SNEK/USD"
+name = "SNEK"
+icon = "snek.png"
 
 # Add more coins as needed:
 # [[coins]]
