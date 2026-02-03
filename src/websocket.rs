@@ -4,22 +4,10 @@ use crate::config::Config;
 use crate::ticker::TickerState;
 use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tokio_tungstenite::{connect_async, tungstenite::Message};
 
 const KRAKEN_WS: &str = "wss://ws.kraken.com/v2";
-const KRAKEN_REST: &str = "https://api.kraken.com/0/public/Ticker";
-
-/// Kraken REST API uses different symbol names than WebSocket.
-fn ws_to_rest_symbol(ws_symbol: &str) -> String {
-    match ws_symbol {
-        "BTC/USD" => "XXBTZUSD".to_string(),
-        "ETH/USD" => "XETHZUSD".to_string(),
-        "XRP/USD" => "XXRPZUSD".to_string(),
-        other => other.replace("/", "").to_uppercase(),
-    }
-}
 
 #[derive(Serialize)]
 struct SubscribeMessage {
@@ -47,44 +35,6 @@ struct TickerData {
     change: Option<f64>,
 }
 
-#[derive(Deserialize)]
-struct RestResponse {
-    result: Option<HashMap<String, RestTicker>>,
-}
-
-#[derive(Deserialize)]
-struct RestTicker {
-    o: Option<String>,
-}
-
-/// Fetch 24h open prices from REST API for percentage calculation.
-fn fetch_open_prices(state: &Arc<Mutex<TickerState>>, config: &Config) {
-    let pairs: Vec<String> = config.coins.iter()
-        .map(|c| ws_to_rest_symbol(&c.symbol))
-        .collect();
-
-    let url = format!("{}?pair={}", KRAKEN_REST, pairs.join(","));
-
-    if let Ok(resp) = reqwest::blocking::get(&url) {
-        if let Ok(data) = resp.json::<RestResponse>() {
-            if let Some(result) = data.result {
-                if let Ok(mut state) = state.lock() {
-                    for coin in &config.coins {
-                        let rest_sym = ws_to_rest_symbol(&coin.symbol);
-                        if let Some(ticker) = result.get(&rest_sym) {
-                            if let Some(open_str) = &ticker.o {
-                                if let Ok(open) = open_str.parse::<f64>() {
-                                    state.set_open_price(&coin.symbol, open);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 /// Main WebSocket loop with automatic reconnection.
 #[tokio::main]
 pub async fn run(state: &Arc<Mutex<TickerState>>, config: &Config) {
@@ -93,8 +43,6 @@ pub async fn run(state: &Arc<Mutex<TickerState>>, config: &Config) {
         .collect();
 
     loop {
-        fetch_open_prices(state, config);
-
         if let Err(e) = connect_and_stream(state, &symbols).await {
             eprintln!("WebSocket error: {:?}", e);
         }

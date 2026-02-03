@@ -19,7 +19,6 @@ futures-util = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.8"
-reqwest = { version = "0.12", features = ["json", "blocking"] }
 resvg = "0.44"
 dirs = "5"
 libc = "0.2"
