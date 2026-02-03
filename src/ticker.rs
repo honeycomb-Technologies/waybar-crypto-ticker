@@ -61,8 +61,13 @@ impl TickerState {
     pub fn set_open_price(&mut self, symbol: &str, open: f64) {
         if let Some(data) = self.prices.get_mut(symbol) {
             data.open_24h = open;
-            self.rebuild_segments();
+        } else {
+            self.prices.insert(symbol.to_string(), CoinData {
+                price: 0.0,
+                open_24h: open,
+            });
         }
+        self.rebuild_segments();
     }
 
     fn get_change(&self, symbol: &str) -> (String, Direction) {
@@ -97,11 +102,14 @@ impl TickerState {
         self.segments.clear();
 
         let active_count = self.coins.iter()
-            .filter(|c| self.prices.contains_key(&c.symbol))
+            .filter(|c| self.prices.get(&c.symbol).map_or(false, |d| d.price > 0.0))
             .count();
 
         for coin in &self.coins {
             if let Some(data) = self.prices.get(&coin.symbol) {
+                if data.price <= 0.0 {
+                    continue;
+                }
                 let (change_str, direction) = self.get_change(&coin.symbol);
                 let price_str = Self::format_price(data.price);
 

@@ -44,6 +44,7 @@ struct WsMessage {
 struct TickerData {
     symbol: Option<String>,
     last: Option<f64>,
+    change: Option<f64>,
 }
 
 #[derive(Deserialize)]
@@ -87,13 +88,13 @@ fn fetch_open_prices(state: &Arc<Mutex<TickerState>>, config: &Config) {
 /// Main WebSocket loop with automatic reconnection.
 #[tokio::main]
 pub async fn run(state: &Arc<Mutex<TickerState>>, config: &Config) {
-    fetch_open_prices(state, config);
-
     let symbols: Vec<String> = config.coins.iter()
         .map(|c| c.symbol.clone())
         .collect();
 
     loop {
+        fetch_open_prices(state, config);
+
         if let Err(e) = connect_and_stream(state, &symbols).await {
             eprintln!("WebSocket error: {:?}", e);
         }
@@ -129,6 +130,12 @@ async fn connect_and_stream(
                                 for ticker in data {
                                     if let (Some(symbol), Some(price)) = (ticker.symbol, ticker.last) {
                                         state.update_price(&symbol, price);
+                                        if let Some(change) = ticker.change {
+                                            let open = price - change;
+                                            if open > 0.0 {
+                                                state.set_open_price(&symbol, open);
+                                            }
+                                        }
                                     }
                                 }
                             }
